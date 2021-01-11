@@ -20,7 +20,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Remora.Discord.Commands.Extensions
@@ -30,7 +29,12 @@ namespace Remora.Discord.Commands.Extensions
     /// </summary>
     public static class StringExtensions
     {
-        private static readonly Regex UnmentionRegex = new("(\\d+)>$", RegexOptions.Compiled);
+        // Discord mention varieties:
+        // - <#123>  (Channel)
+        // - <@123>  (User)
+        // - <@!123> (User)
+        // - <@&123> (Role)
+        private static readonly Regex UnmentionRegex = new("<(?:#|@[!&]?)(\\d+)>$", RegexOptions.Compiled);
 
         /// <summary>
         /// Removes Discord mention markdown from a string.
@@ -52,7 +56,7 @@ namespace Remora.Discord.Commands.Extensions
             var regexMatches = UnmentionRegex.Match(value);
             return !regexMatches.Success
                 ? value
-                : regexMatches.Groups.First<Group>().Value;
+                : regexMatches.Groups[1].Value;
         }
     }
 }
